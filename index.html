@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homelab</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <button id="sidebarToggle" class="icon-btn" aria-label="Toggle sidebar" title="Toggle sidebar">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <span class="brand" id="brandTitle">Homelab</span>
+      </div>
+
+      <div class="sidebar-search">
+        <input type="search" id="searchInput" placeholder="Search…" autocomplete="off">
+      </div>
+
+      <nav class="nav-groups" id="navGroups"></nav>
+
+      <div class="sidebar-footer" id="sidebarFooter"></div>
+    </aside>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+    <main class="content">
+      <div class="content-header">
+        <button id="homeBtn" class="icon-btn" title="Home">
+          <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span id="paneTitle" class="pane-title">Home</span>
+        <span id="clock" class="clock"></span>
+        <a id="openExternal" class="icon-btn hidden" href="#" target="_blank" rel="noreferrer" title="Open in new tab">
+          <svg viewBox="0 0 24 24"><path d="M14 4h6v6M10 14 20 4M6 4h4v0H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <div class="pane-body">
+        <div id="dashboardGrid" class="dashboard-grid hidden"></div>
+        <div id="placeholder" class="placeholder hidden">
+          <p>Pick something from the sidebar.</p>
+        </div>
+        <iframe id="paneFrame" class="pane-frame hidden" title="Service view"></iframe>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/vendor/js-yaml.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+# This is the ONLY file you need to edit to change what's on the start page.
+# Add/remove/reorder groups and items freely — the page picks it up on reload
+# (just refresh the browser tab, no build step, no restart).
+#
+# Each item's "link" describes how to build its URL from wherever this page
+# itself is being loaded from (same trick the old site used, generalized):
+#   type: domain   -> value is used as-is, e.g. https://sub.example.com
+#   type: path     -> value is appended to THIS page's own origin, e.g. /gitea/
+#                      (for services reverse-proxied on the same host/Traefik)
+#   type: port     -> value is a port number on THIS page's own hostname,
+#                      e.g. 8123 -> http://<same-host>:8123
+#                      optional "path" is appended after the port.
+#
+# "embed: true"  -> clicking loads the service into the pane on the right,
+#                    without leaving this page (like the old <object> panel).
+# "embed: false" -> clicking opens the service in a new browser tab instead
+#                    (use this for anything that refuses to be iframed, e.g.
+#                    Home Assistant, Immich, Nextcloud, Joplin below — some
+#                    services send X-Frame-Options/CSP headers that block
+#                    embedding and there's no way to detect that up front,
+#                    so this has to be a manual choice per item).
+#
+# Icons: "local:name" -> icons/name.svg, loaded from this project — the
+#        icons/ folder already has one for everything below, and IS the fix
+#        for "can never find the right icon": save any SVG you like (repo
+#        icon page, a logo you exported yourself, whatever) as icons/name.svg
+#        and reference it as local:name, no hunting through remote icon sets
+#        required. To swap one that looks wrong, just overwrite that file —
+#        the reference in this config doesn't change.
+#        Remote sets are still available if you'd rather not save a file:
+#        "sh:name" (selfh.st, best coverage for self-hosted apps),
+#        "mdi:name" (Material Design Icons), "si:name" (Simple Icons).
+#        Browse: https://selfh.st/icons  https://pictogrammers.com/library/mdi/
+#        A bare URL or path (e.g. https://example.com/x.svg) also works as-is.
+#
+# Each group's own "icon" is what shows when the sidebar is folded — folded
+# mode collapses each group down to that one icon; hover (or tap) it to pop
+# open a flyout with the group's items, same as expanded mode.
+#
+# "dashboard: <number>" puts an item on the home grid — the page you land on
+# before picking anything, and can always get back to via the house icon in
+# the top-left of the content pane — at that fixed position (1, 2, 3, ...),
+# sorted ascending. It's a position, not just on/off, so a service always
+# lands in the same grid cell no matter what you reorder elsewhere in this
+# file — the point being able to find it by muscle memory instead of
+# rereading the grid each time. Leave the field off (or "dashboard: none")
+# for anything that shouldn't be on the grid. No items marked = home grid is
+# empty and the page falls back to the plain "pick something" placeholder.
+# Numbers don't need to be contiguous or unique to a group, just unique
+# overall — they're only compared to each other for sort order.
+#
+# "clock:" (optional, top-level) controls the clock in the content header.
+# Every field is optional and defaults to what's shown here if the whole
+# section is left out entirely.
+#   enabled:  true | false        — false hides the clock completely
+#   timezone: local | IANA name   — "local" uses the viewing browser's own
+#                                    timezone; otherwise e.g. "Europe/Kyiv",
+#                                    "America/New_York" — a fixed zone
+#                                    regardless of who's looking at the page
+#                                    or which device they're on. A typo here
+#                                    just falls back to "local" rather than
+#                                    breaking the clock.
+#   hour12:   true | false         — true = "2:07 PM", false = "14:07".
+#                                    Leave it off entirely to follow the
+#                                    browser's own locale default instead of
+#                                    forcing one.
+#   seconds:  true | false         — show/hide ":SS"
+#   weekday:  true | false         — show/hide "Thu"
+#   date:     true | false         — show/hide "Jul 23"
+
+title: My Homelab
+theme: dark # dark | light — just the initial value; the footer toggle overrides
+            # and remembers your choice per browser after that
+
+clock:
+  enabled: true
+  timezone: local
+  # hour12 left unset on purpose: it follows your browser's own locale
+  # default (e.g. AM/PM in en-US) until you set it explicitly. Uncomment
+  # one to force it regardless of locale:
+  # hour12: true    # e.g. "2:07 PM"
+  # hour12: false   # e.g. "14:07"
+  seconds: true
+  weekday: true
+  date: true
+
+groups:
+  - name: Network
+    icon: local:lan
+    items:
+      - name: Status
+        icon: local:chart-line
+        embed: true
+        dashboard: 1
+        link: { type: domain, value: https://status.example.com }
+
+      - name: VPN Admin
+        icon: local:openvpn
+        embed: true
+        link: { type: path, value: /ovpn/ }
+
+      - name: WireGuard
+        icon: local:wireguard
+        embed: true
+        link: { type: domain, value: https://wireguard.example.com }
+
+      - name: ZeroTier
+        icon: local:zerotier
+        embed: true
+        link: { type: domain, value: https://zerotier.example.com }
+
+  - name: Infrastructure
+    icon: local:server
+    items:
+      - name: Traefik
+        icon: local:traefik
+        embed: true
+        dashboard: 2
+        link: { type: path, value: /traefik/ }
+
+      - name: Portainer
+        icon: local:portainer
+        embed: true
+        dashboard: 3
+        link: { type: path, value: /portainer/ }
+
+      - name: Logs (Dozzle)
+        icon: local:dozzle
+        embed: true
+        link: { type: path, value: /dozzle/ }
+
+      - name: Update UI
+        icon: local:update
+        embed: true
+        link: { type: port, value: 3033 }
+
+      - name: Jenkins
+        icon: local:jenkins
+        embed: true
+        link: { type: path, value: /jenkins/ }
+
+      - name: Gitea
+        icon: local:gitea
+        embed: true
+        dashboard: 4
+        link: { type: path, value: /gitea/ }
+
+      - name: Linux Shell
+        icon: local:console
+        embed: true
+        link: { type: path, value: /shell/ }
+
+  - name: Files & Sync
+    icon: local:folder-sync
+    items:
+      - name: Syncthing
+        icon: local:syncthing
+        embed: true
+        link: { type: path, value: /syncthing/ }
+
+      - name: File Browser
+        icon: local:filebrowser
+        embed: true
+        link: { type: path, value: /fb/ }
+
+      - name: WebDAV Manager
+        icon: local:folder-network
+        embed: true
+        link: { type: port, value: 8080 }
+
+      - name: CouchDB
+        icon: local:couchdb
+        embed: true
+        link: { type: port, value: 5984, path: /_utils/ }
+
+  - name: Home
+    icon: local:home
+    items:
+      - name: Home Assistant
+        icon: local:home-assistant
+        embed: false
+        dashboard: 5
+        link: { type: port, value: 8123 }
+
+      - name: Traccar
+        icon: local:map-marker-radius
+        embed: false
+        link: { type: port, value: 8082 }
+
+      - name: Immich
+        icon: local:immich
+        embed: true
+        dashboard: 6
+        link: { type: port, value: 2283 }
+
+      - name: Nextcloud
+        icon: local:nextcloud
+        embed: false
+        dashboard: 7
+        link: { type: domain, value: https://cloud.example.com }
+
+      - name: Joplin Notes
+        icon: local:joplin
+        embed: false
+        link: { type: domain, value: https://notes.example.com }
+
+  - name: Media
+    icon: local:movie-open
+    items:
+      - name: Plex
+        icon: local:plex
+        embed: true
+        dashboard: 8
+        link: { type: domain, value: https://plex.example.com/web/index.html }
+
+      - name: Lidarr
+        icon: local:lidarr
+        embed: true
+        link: { type: path, value: /lidarr/ }
+
+      - name: Sonarr
+        icon: local:sonarr
+        embed: true
+        dashboard: 9
+        link: { type: path, value: /sonarr/ }
+
+      - name: Radarr
+        icon: local:radarr
+        embed: true
+        dashboard: 10
+        link: { type: path, value: /radarr/ }
+
+      - name: Prowlarr
+        icon: local:prowlarr
+        embed: true
+        link: { type: path, value: /prowlarr/ }
+
+      - name: Tidarr
+        icon: local:music-box-multiple
+        embed: true
+        link: { type: port, value: 8484 }
+
+      - name: Transmission
+        icon: local:transmission
+        embed: true
+        link: { type: path, value: /transmission/web/ }
+
+      - name: Snapcast
+        icon: local:cast-audio
+        embed: true
+        link: { type: port, value: 1780 }
+
+      - name: LedFX
+        icon: local:led-strip-variant
+        embed: true
+        link: { type: port, value: 8889 }
+
+  - name: AI & Automation
+    icon: local:robot
+    items:
+      - name: n8n
+        icon: local:n8n
+        embed: false
+        link: { type: domain, value: https://n8n.example.com }
+
+      - name: n8n (LAN)
+        icon: local:n8n
+        embed: false
+        link: { type: port, value: 5678 }
+
+      - name: Flowise
+        icon: local:sitemap
+        embed: false
+        link: { type: domain, value: https://flowise.example.com }
+
+      - name: Flowise (LAN)
+        icon: local:sitemap
+        embed: false
+        link: { type: port, value: 3456 }
+
+      - name: MetaMCP
+        icon: local:tools
+        embed: false
+        link: { type: port, value: 12008 }
+
+  - name: Mobile
+    icon: local:cellphone
+    items:
+      - name: Android (scrcpy)
+        icon: local:cellphone
+        embed: true
+        link: { type: port, value: 8833 }

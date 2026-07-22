@@ -1,0 +1,14 @@
+# Private dashboard profiles — real infrastructure (domains, ports, service
+# layout) that shouldn't be public. index.html/config.yaml (the generic
+# demo/template) are the only profile meant to be tracked.
+admin.html
+home.html
+everything.html
+config.admin.yaml
+config.home.yaml
+config.everything.yaml
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp

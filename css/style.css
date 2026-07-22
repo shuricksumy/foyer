@@ -1,0 +1,529 @@
+:root {
+  --bg: #14151a;
+  --bg-elevated: #1b1d24;
+  --bg-hover: #262932;
+  --border: #2a2d37;
+  --text: #e7e9ee;
+  --text-muted: #9298a6;
+  --accent: #5b8cff;
+  --accent-text: #0b1020;
+  --radius: 10px;
+  --sidebar-w: 260px;
+  --sidebar-w-collapsed: 64px;
+}
+
+:root[data-theme="light"] {
+  --bg: #f5f6f8;
+  --bg-elevated: #ffffff;
+  --bg-hover: #eceef2;
+  --border: #dfe2e8;
+  --text: #1a1d24;
+  --text-muted: #6b7280;
+  --accent: #3462e0;
+  --accent-text: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------- Sidebar ---------- */
+
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--bg-elevated);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: width .18s ease, min-width .18s ease;
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: var(--sidebar-w-collapsed);
+  min-width: var(--sidebar-w-collapsed);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.brand {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar.collapsed .brand,
+.sidebar.collapsed .sidebar-search,
+.sidebar.collapsed .sidebar-footer {
+  display: none;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sidebar-search {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-search input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.sidebar-search input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.nav-groups {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.nav-groups::-webkit-scrollbar {
+  width: 8px;
+}
+
+.nav-groups::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav-groups::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.nav-groups::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.group {
+  margin-bottom: 4px;
+}
+
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.group-title:hover {
+  color: var(--text);
+}
+
+.group-title .chevron {
+  width: 12px;
+  height: 12px;
+  transition: transform .15s ease;
+  flex-shrink: 0;
+}
+
+.group.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.group.collapsed .item-list {
+  display: none;
+}
+
+/* ---------- Folded sidebar: per-group flyout ---------- */
+/* Folded mode shows one representative icon per group (group-icon-btn)
+   instead of the group header + inline item list. Hovering/tapping it
+   pops the group's item list open as a floating panel next to it — same
+   items, same click behavior as expanded mode, just reached differently.
+   JS reparents the real <ul class="item-list"> to <body> (position:fixed,
+   .flyout-active) while it's open, because overflow clipping from the
+   sidebar/.nav-groups scroll containers applies to descendants regardless
+   of position:absolute/fixed — only actually leaving that DOM subtree
+   escapes it. It's moved back into its .group on close. */
+
+.group-icon-btn {
+  display: none;
+}
+
+.sidebar.collapsed .group-title {
+  display: none;
+}
+
+/* Hides the inline item list for groups that were left expanded before
+   folding — while a list is showing as a flyout it's been reparented to
+   <body> (see above), so it's no longer a descendant of .sidebar and this
+   rule doesn't touch it. */
+.sidebar.collapsed .item-list {
+  display: none;
+}
+
+.sidebar.collapsed .group-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 7px 0;
+  margin: 1px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.sidebar.collapsed .group-icon-btn:hover {
+  background: var(--bg-hover);
+}
+
+.item-list.flyout-active {
+  position: fixed;
+  width: max-content;
+  min-width: 200px;
+  max-width: 280px;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
+  z-index: 1000;
+}
+
+.flyout-header {
+  display: none;
+}
+
+.item-list.flyout-active .flyout-header {
+  display: block;
+  padding: 6px 10px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  margin: 1px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.item:hover {
+  background: var(--bg-hover);
+}
+
+.item.active {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.item.active .item-label {
+  color: var(--accent-text);
+}
+
+.item-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 6px;
+}
+
+/* Applied only to icons whose own colors are too close to the current
+   page background (checked at runtime) — gives them a contrasting chip
+   so they don't disappear. Icons that already contrast fine get no chip. */
+.item-icon-wrap.icon-needs-backing {
+  background: #16171c;
+}
+
+.item-icon-wrap.icon-needs-backing.icon-backing-light {
+  background: #ffffff;
+}
+
+.item-icon-wrap.icon-needs-backing .item-icon {
+  padding: 3px;
+}
+
+.item-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.item-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13.5px;
+}
+
+.item.new-tab-hint::after {
+  content: "↗";
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.item.active.new-tab-hint::after {
+  color: var(--accent-text);
+  opacity: .8;
+}
+
+.item.hidden-by-search {
+  display: none;
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 10px 10px 14px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- Main content ---------- */
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.content-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.pane-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clock {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .clock {
+    display: none;
+  }
+}
+
+.pane-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.pane-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+.dashboard-grid {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+  align-content: start;
+  padding: 28px;
+}
+
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+}
+
+.dashboard-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.dashboard-card .item-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.dashboard-card .item-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.dashboard-card-label {
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .sidebar {
+    position: fixed;
+    z-index: 10;
+    height: 100%;
+  }
+  .sidebar:not(.collapsed) {
+    width: 82vw;
+    min-width: 220px;
+  }
+
+  /* On desktop, folding the sidebar shrinks it in-flow so .content just
+     reflows into the freed space. On mobile the sidebar is taken out of
+     flow (position:fixed) so it can overlay content instead of squeezing
+     it into a sliver — but that means an "open" (not collapsed) sidebar
+     here is a full drawer sitting on top of everything, with nothing
+     underneath to tap to dismiss it. This backdrop is that tap target: a
+     dimmed scrim behind the open drawer, closing it on click, so content
+     un-covers itself instead of being permanently blocked. */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 9;
+    background: rgba(0, 0, 0, .45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease;
+  }
+
+  .sidebar-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
