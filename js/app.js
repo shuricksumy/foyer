@@ -314,6 +314,8 @@
     dashboardEntries.length = 0;
 
     groups.forEach((group, gi) => {
+      if (group.enabled === false) return;
+
       const groupId = group.name || `group-${gi}`;
       const groupEl = document.createElement("div");
       groupEl.className = "group";
@@ -381,6 +383,8 @@
       list.appendChild(flyoutHeader);
 
       (group.items || []).forEach((item) => {
+        if (item.enabled === false) return;
+
         const url = buildUrl(item.link);
         const li = document.createElement("li");
         const a = document.createElement("a");

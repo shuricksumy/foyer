@@ -39,6 +39,12 @@
 # mode collapses each group down to that one icon; hover (or tap) it to pop
 # open a flyout with the group's items, same as expanded mode.
 #
+# "enabled: false" on an item or a whole group hides it everywhere (sidebar,
+# flyout, dashboard grid) without deleting it — for a service that's
+# temporarily down, being reinstalled, whatever. Leave the field off
+# (defaults to enabled) for anything that should just show up normally.
+# Disabling a group hides all its items regardless of their own "enabled".
+#
 # "dashboard: <number>" puts an item on the home grid — the page you land on
 # before picking anything, and can always get back to via the house icon in
 # the top-left of the content pane — at that fixed position (1, 2, 3, ...),

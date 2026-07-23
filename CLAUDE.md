@@ -53,6 +53,9 @@ editing, it's the source of truth, not this file. Briefly:
 - **`dashboard: <number>`** puts an item on the home grid (`renderDashboardGrid()`) at that fixed
   sorted position — a position, not just on/off, so an item stays in the same grid cell regardless of
   config reordering elsewhere.
+- **`enabled: false`** on an item or group hides it everywhere (sidebar, flyout, dashboard grid) —
+  checked as an early-return at the top of each `forEach` in `renderGroups()`, so a disabled group's
+  items never even get processed. Defaults to enabled when the field is absent.
 - **Icons** default to `icons/*.svg` (one file per icon in use, referenced via `icon: local:name`) —
   added specifically so a wrong/missing icon is "overwrite the file" instead of "hunt for the right
   slug on a remote icon set." `sh:`/`mdi:`/`si:` prefixes (resolved live against selfh.st/MDI/Simple
