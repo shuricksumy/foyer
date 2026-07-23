@@ -15,10 +15,12 @@
 #                    without leaving this page (like the old <object> panel).
 # "embed: false" -> clicking opens the service in a new browser tab instead
 #                    (use this for anything that refuses to be iframed, e.g.
-#                    Home Assistant, Immich, Nextcloud, Joplin below — some
-#                    services send X-Frame-Options/CSP headers that block
-#                    embedding and there's no way to detect that up front,
-#                    so this has to be a manual choice per item).
+#                    Nextcloud, Plex, Traefik, Jenkins below — some services
+#                    send X-Frame-Options/CSP headers that block embedding
+#                    and there's no way to detect that up front, so this
+#                    has to be a manual choice per item. When in doubt, set
+#                    it true and check — a blocked iframe just shows blank,
+#                    nothing breaks).
 #
 # Icons: "local:name" -> icons/name.svg, loaded from this project — the
 #        icons/ folder already has one for everything below, and IS the fix
@@ -92,7 +94,7 @@ groups:
         icon: local:chart-line
         embed: true
         dashboard: 1
-        link: { type: domain, value: https://status.example.com }
+        link: { type: path, value: /status/ }
 
       - name: VPN Admin
         icon: local:openvpn
@@ -101,28 +103,28 @@ groups:
 
       - name: WireGuard
         icon: local:wireguard
-        embed: true
-        link: { type: domain, value: https://wireguard.example.com }
+        embed: false # wireguard.com sends X-Frame-Options: sameorigin
+        link: { type: domain, value: https://www.wireguard.com }
 
       - name: ZeroTier
         icon: local:zerotier
         embed: true
-        link: { type: domain, value: https://zerotier.example.com }
+        link: { type: domain, value: https://www.zerotier.com }
 
   - name: Infrastructure
     icon: local:server
     items:
       - name: Traefik
         icon: local:traefik
-        embed: true
+        embed: false # traefik.io sends X-Frame-Options: sameorigin
         dashboard: 2
-        link: { type: path, value: /traefik/ }
+        link: { type: domain, value: https://traefik.io }
 
       - name: Portainer
         icon: local:portainer
         embed: true
         dashboard: 3
-        link: { type: path, value: /portainer/ }
+        link: { type: domain, value: https://www.portainer.io }
 
       - name: Logs (Dozzle)
         icon: local:dozzle
@@ -136,14 +138,14 @@ groups:
 
       - name: Jenkins
         icon: local:jenkins
-        embed: true
-        link: { type: path, value: /jenkins/ }
+        embed: false # jenkins.io sends X-Frame-Options: DENY
+        link: { type: domain, value: https://www.jenkins.io }
 
       - name: Gitea
         icon: local:gitea
         embed: true
         dashboard: 4
-        link: { type: path, value: /gitea/ }
+        link: { type: domain, value: https://about.gitea.com }
 
       - name: Linux Shell
         icon: local:console
@@ -156,7 +158,7 @@ groups:
       - name: Syncthing
         icon: local:syncthing
         embed: true
-        link: { type: path, value: /syncthing/ }
+        link: { type: domain, value: https://syncthing.net }
 
       - name: File Browser
         icon: local:filebrowser
@@ -178,9 +180,9 @@ groups:
     items:
       - name: Home Assistant
         icon: local:home-assistant
-        embed: false
+        embed: true
         dashboard: 5
-        link: { type: port, value: 8123 }
+        link: { type: domain, value: https://www.home-assistant.io }
 
       - name: Traccar
         icon: local:map-marker-radius
@@ -191,49 +193,49 @@ groups:
         icon: local:immich
         embed: true
         dashboard: 6
-        link: { type: port, value: 2283 }
+        link: { type: domain, value: https://immich.app }
 
       - name: Nextcloud
         icon: local:nextcloud
-        embed: false
+        embed: false # nextcloud.com sends Content-Security-Policy: frame-ancestors 'self'
         dashboard: 7
-        link: { type: domain, value: https://cloud.example.com }
+        link: { type: domain, value: https://nextcloud.com }
 
       - name: Joplin Notes
         icon: local:joplin
-        embed: false
-        link: { type: domain, value: https://notes.example.com }
+        embed: true
+        link: { type: domain, value: https://joplinapp.org }
 
   - name: Media
     icon: local:movie-open
     items:
       - name: Plex
         icon: local:plex
-        embed: true
+        embed: false # plex.tv sends Content-Security-Policy: frame-ancestors 'self'
         dashboard: 8
-        link: { type: domain, value: https://plex.example.com/web/index.html }
+        link: { type: domain, value: https://www.plex.tv }
 
       - name: Lidarr
         icon: local:lidarr
         embed: true
-        link: { type: path, value: /lidarr/ }
+        link: { type: domain, value: https://lidarr.audio }
 
       - name: Sonarr
         icon: local:sonarr
-        embed: true
+        embed: false # sonarr.tv sends X-Frame-Options: DENY
         dashboard: 9
-        link: { type: path, value: /sonarr/ }
+        link: { type: domain, value: https://sonarr.tv }
 
       - name: Radarr
         icon: local:radarr
         embed: true
         dashboard: 10
-        link: { type: path, value: /radarr/ }
+        link: { type: domain, value: https://radarr.video }
 
       - name: Prowlarr
         icon: local:prowlarr
         embed: true
-        link: { type: path, value: /prowlarr/ }
+        link: { type: domain, value: https://prowlarr.com }
 
       - name: Tidarr
         icon: local:music-box-multiple
@@ -243,7 +245,7 @@ groups:
       - name: Transmission
         icon: local:transmission
         embed: true
-        link: { type: path, value: /transmission/web/ }
+        link: { type: domain, value: https://transmissionbt.com }
 
       - name: Snapcast
         icon: local:cast-audio
@@ -260,8 +262,8 @@ groups:
     items:
       - name: n8n
         icon: local:n8n
-        embed: false
-        link: { type: domain, value: https://n8n.example.com }
+        embed: false # n8n.io sends X-Frame-Options: DENY
+        link: { type: domain, value: https://n8n.io }
 
       - name: n8n (LAN)
         icon: local:n8n
@@ -270,8 +272,8 @@ groups:
 
       - name: Flowise
         icon: local:sitemap
-        embed: false
-        link: { type: domain, value: https://flowise.example.com }
+        embed: true
+        link: { type: domain, value: https://flowiseai.com }
 
       - name: Flowise (LAN)
         icon: local:sitemap
