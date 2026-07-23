@@ -193,6 +193,7 @@ groups:
       - name: Traccar
         icon: local:map-marker-radius
         embed: false
+        enabled: false # live example: this is why Traccar isn't in the demo sidebar
         link: { type: port, value: 8082 }
 
       - name: Immich
@@ -293,6 +294,7 @@ groups:
 
   - name: Mobile
     icon: local:cellphone
+    enabled: false # live example: this is why the Mobile group isn't in the demo sidebar
     items:
       - name: Android (scrcpy)
         icon: local:cellphone
