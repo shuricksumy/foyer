@@ -503,6 +503,18 @@ body {
     min-width: 220px;
   }
 
+  /* Because .sidebar is position:fixed here, it's out of normal flow and
+     .content doesn't automatically reflow around it the way it does on
+     desktop — without this, the folded icon rail permanently sits on top
+     of the content-header (home button, title) and the left edge of the
+     grid/iframe underneath, since nothing shifts to make room for it. The
+     expanded (82vw) drawer is still fine overlapping this margin — it's a
+     temporary overlay meant to cover content while open, dismissed via the
+     backdrop below, not something content should permanently reflow for. */
+  .content {
+    margin-left: var(--sidebar-w-collapsed);
+  }
+
   /* On desktop, folding the sidebar shrinks it in-flow so .content just
      reflows into the freed space. On mobile the sidebar is taken out of
      flow (position:fixed) so it can overlay content instead of squeezing
