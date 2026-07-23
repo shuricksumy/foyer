@@ -73,6 +73,14 @@ field. Refresh the browser tab, no restart needed. In short, each item needs:
 - `icon` — `local:name` (loads `icons/name.svg` from this project; every icon currently in
   use already has a file there — see `icons/`), `sh:name` (selfh.st), `mdi:name`, `si:name`,
   or a direct URL/local path.
+- `dashboard: <number>` — puts the item on the home grid at that fixed sorted position (not
+  just on/off — a position, so it stays in the same grid cell regardless of config reordering
+  elsewhere). Leave it off to keep the item off the grid.
+- `enabled: false` — on an item or a whole group, hides it everywhere (sidebar, flyout,
+  dashboard grid) without deleting its config — for something temporarily down or being
+  reinstalled. Defaults to enabled when left off; disabling a group hides all its items
+  regardless of their own `enabled`. See `config.yaml`'s `Traccar`/`Mobile` entries for a
+  working example of both.
 
 ## Icons
 
