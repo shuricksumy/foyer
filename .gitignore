@@ -1,12 +1,16 @@
-# Private dashboard profiles — real infrastructure (domains, ports, service
-# layout) that shouldn't be public. index.html/config.yaml (the generic
-# demo/template) are the only profile meant to be tracked.
-admin.html
-home.html
-everything.html
-config.admin.yaml
-config.home.yaml
-config.everything.yaml
+# Whitelist, not a blocklist: every *.html/*.yaml/*.yml file at the repo
+# root is private-by-default (dashboard profiles hold real domains, ports,
+# service layout) except the specific public files negated below. This
+# means a new private profile (e.g. work.html + config.work.yaml) needs no
+# entry here at all — it's already covered — while a new *public* one
+# needs an explicit "!" line, which is a deliberate speed bump against
+# accidentally publishing something real.
+/*.html
+/*.yaml
+/*.yml
+!/index.html
+!/config.yaml
+!/docker-compose.yml
 
 # OS / editor cruft
 .DS_Store

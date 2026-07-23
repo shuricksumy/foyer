@@ -13,13 +13,50 @@ entirely in YAML config files, not HTML, so adding or changing a service is a co
 markup surgery.
 
 No build step. Static HTML/CSS/vanilla JS, `js-yaml` vendored locally (`js/vendor/`) for parsing the
-config in the browser. Serve this folder however you'd serve any static site (Traefik/nginx, no
-special config needed) — or for local testing:
+config in the browser. Serve this folder however you'd serve any static site — or for local testing:
 
 ```sh
 python3 -m http.server 8091
 # open http://localhost:8091
 ```
+
+## Deploying
+
+`docker-compose.yml` runs it behind nginx, with Traefik labels for reverse-proxy routing (drop the
+`labels:`/`networks:` blocks entirely if you're not using Traefik — the published port alone is
+enough):
+
+```yaml
+services:
+  foyer:
+    container_name: foyer
+    image: nginx:alpine
+    restart: unless-stopped
+    # Mount only the files a profile actually needs — never the whole repo
+    # root, so things like .git/README.md/.gitignore never end up served
+    # over HTTP even if they exist in your working copy.
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./config.yaml:/usr/share/nginx/html/config.yaml:ro
+      - ./css:/usr/share/nginx/html/css:ro
+      - ./js:/usr/share/nginx/html/js:ro
+      - ./icons:/usr/share/nginx/html/icons:ro
+    ports:
+      - "8080:80"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.foyer.rule=Host(`start.example.com`)
+      - traefik.http.routers.foyer.entrypoints=websecure
+      - traefik.http.routers.foyer.tls=true
+      - traefik.http.services.foyer.loadbalancer.server.port=80
+      # Only needed if this container and Traefik aren't already on the
+      # same Docker network:
+      # - traefik.docker.network=your_traefik_network
+```
+
+Swap `start.example.com` for your real domain, and the volume list for a private profile's files
+(e.g. `admin.html` + `config.admin.yaml`) to deploy that one instead of the public demo — that's the
+only thing that changes per profile/host. `docker compose up -d` and it's running.
 
 ## Profiles
 
@@ -33,11 +70,13 @@ Entry pages share this same app/css/icons, each pointing at its own config file 
 | `admin.html` | `config.admin.yaml` | **no** — gitignored | your real setup, network/infra only |
 | `home.html` | `config.home.yaml` | **no** — gitignored | your real setup, media/home/AI |
 
-Only `index.html`/`config.yaml` are meant to be public — everything else in `.gitignore` holds real
-domains/ports/service names and stays local-only, never pushed. To add another private profile: copy
-`index.html`, point its `data-config` at a new config filename, and add both filenames to
-`.gitignore`. To add a *public* one instead, do the same but leave it out of `.gitignore` — just make
-sure its config doesn't contain anything you don't want visible to anyone who can see the repo.
+Only `index.html`/`config.yaml` are meant to be public — `.gitignore` is a whitelist (every
+`*.html`/`*.yaml`/`*.yml` at the repo root is private by default, with `index.html`/`config.yaml`/
+`docker-compose.yml` explicitly allowed through). That means a new *private* profile needs no
+`.gitignore` changes at all — copy `index.html`, point its `data-config` at a new config filename,
+done, it's already hidden. A new *public* one needs an explicit `!/filename` line added to
+`.gitignore` — a deliberate speed bump so publishing something real takes an intentional step, not
+just a forgotten one.
 
 Sidebar-collapsed and theme preferences are shared across all profiles (same browser,
 same localStorage) since that's a per-visitor UI preference, not part of any one profile.

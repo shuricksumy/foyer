@@ -30,11 +30,12 @@ to `config.yaml` if the attribute is absent):
 
 **This repo is public.** `index.html`/`config.yaml` is the only profile meant to be world-readable —
 it must stay a generic example (placeholder `example.com`-style domains, no real hostnames/personal
-name/service topology). The other three profiles hold the real setup and are `.gitignore`d
-specifically so that stays true; don't add real data to `config.yaml` and don't remove those entries
-from `.gitignore`. Add another *private* profile the same way (copy an entry HTML file, point
-`data-config` at a new YAML file, add both to `.gitignore`); a *public* one skips the gitignore step
-but needs the same sanitization discipline as `config.yaml`.
+name/service topology). `.gitignore` is a whitelist, not a blocklist: every `*.html`/`*.yaml`/`*.yml`
+at the repo root is private by default, with `index.html`/`config.yaml`/`docker-compose.yml`
+explicitly negated back in. Don't add real data to `config.yaml`, and don't remove or weaken those
+`!`-negation lines. A new *private* profile needs zero `.gitignore` changes (already covered by the
+blanket rule); a new *public* one needs an explicit `!/filename` line plus the same sanitization
+discipline as `config.yaml`.
 
 Each config is a flat schema: `groups:` → `items:`, plus a few top-level keys (`title`, `theme`,
 `clock`). Every field is documented inline in `config.yaml`'s header comment — read that before

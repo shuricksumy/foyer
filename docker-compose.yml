@@ -1,0 +1,37 @@
+services:
+  foyer:
+    container_name: foyer
+    image: nginx:alpine
+    restart: unless-stopped
+    # Mount only the files a profile actually needs — never the whole repo
+    # root, so things like .git/README.md/.gitignore never end up served
+    # over HTTP even if they exist in your working copy. Swap index.html +
+    # config.yaml below for a private profile (e.g. admin.html +
+    # config.admin.yaml) to deploy that one instead of the public demo.
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./config.yaml:/usr/share/nginx/html/config.yaml:ro
+      - ./css:/usr/share/nginx/html/css:ro
+      - ./js:/usr/share/nginx/html/js:ro
+      - ./icons:/usr/share/nginx/html/icons:ro
+    # Skip this if you're routing everything through the Traefik labels
+    # below instead of publishing the port directly.
+    ports:
+      - "8080:80"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.foyer.rule=Host(`start.example.com`)
+      - traefik.http.routers.foyer.entrypoints=websecure
+      - traefik.http.routers.foyer.tls=true
+      - traefik.http.services.foyer.loadbalancer.server.port=80
+      # Only needed if this container and Traefik aren't already on the
+      # same Docker network:
+      # - traefik.docker.network=your_traefik_network
+    # Only needed if Traefik reaches this container over a specific
+    # shared network rather than the default one Compose creates:
+    # networks:
+    #   - your_traefik_network
+
+# networks:
+#   your_traefik_network:
+#     external: true
