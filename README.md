@@ -22,41 +22,17 @@ python3 -m http.server 8091
 
 ## Deploying
 
-`docker-compose.yml` runs it behind nginx, with Traefik labels for reverse-proxy routing (drop the
-`labels:`/`networks:` blocks entirely if you're not using Traefik — the published port alone is
-enough):
+`docker-compose.yml` runs it behind nginx (`nginx:alpine`), mounting only the specific files a
+profile needs rather than the whole repo root — so `.git`/`README.md`/`.gitignore` etc. never end up
+served over HTTP even if they exist in your working copy. `docker compose up -d` and it's running on
+`:8080`.
 
-```yaml
-services:
-  foyer:
-    container_name: foyer
-    image: nginx:alpine
-    restart: unless-stopped
-    # Mount only the files a profile actually needs — never the whole repo
-    # root, so things like .git/README.md/.gitignore never end up served
-    # over HTTP even if they exist in your working copy.
-    volumes:
-      - ./index.html:/usr/share/nginx/html/index.html:ro
-      - ./config.yaml:/usr/share/nginx/html/config.yaml:ro
-      - ./css:/usr/share/nginx/html/css:ro
-      - ./js:/usr/share/nginx/html/js:ro
-      - ./icons:/usr/share/nginx/html/icons:ro
-    ports:
-      - "8080:80"
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.foyer.rule=Host(`start.example.com`)
-      - traefik.http.routers.foyer.entrypoints=websecure
-      - traefik.http.routers.foyer.tls=true
-      - traefik.http.services.foyer.loadbalancer.server.port=80
-      # Only needed if this container and Traefik aren't already on the
-      # same Docker network:
-      # - traefik.docker.network=your_traefik_network
-```
-
-Swap `start.example.com` for your real domain, and the volume list for a private profile's files
+It includes Traefik labels for reverse-proxy routing — HTTPS on a dedicated subdomain by default,
+with a plain-HTTP/`PathPrefix` alternative documented right next to it for serving `foyer` at the
+root of an existing host instead. Drop the `labels:`/`networks:` blocks entirely if you're not using
+Traefik; the published port alone is enough. Swap the volume list for a private profile's files
 (e.g. `admin.html` + `config.admin.yaml`) to deploy that one instead of the public demo — that's the
-only thing that changes per profile/host. `docker compose up -d` and it's running.
+only thing that changes per profile/host.
 
 ## Profiles
 

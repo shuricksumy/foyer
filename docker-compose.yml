@@ -19,11 +19,20 @@ services:
     ports:
       - "8080:80"
     labels:
+      # HTTPS on a dedicated subdomain (recommended if Traefik is already
+      # doing TLS termination for you):
       - traefik.enable=true
       - traefik.http.routers.foyer.rule=Host(`start.example.com`)
       - traefik.http.routers.foyer.entrypoints=websecure
       - traefik.http.routers.foyer.tls=true
       - traefik.http.services.foyer.loadbalancer.server.port=80
+      # Simpler alternative: plain HTTP at the root of an existing host
+      # (e.g. serving foyer as the landing page of your whole domain,
+      # no dedicated subdomain/TLS setup needed). Comment out the four
+      # lines above and uncomment these instead:
+      # - traefik.http.routers.foyer.rule=PathPrefix(`/`)
+      # - traefik.http.routers.foyer.entrypoints=web
+      # - traefik.http.services.foyer.loadbalancer.server.port=80
       # Only needed if this container and Traefik aren't already on the
       # same Docker network:
       # - traefik.docker.network=your_traefik_network
