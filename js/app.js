@@ -113,9 +113,36 @@
     return 0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2];
   }
 
+  // Icons come from many unrelated third-party sources (mostly brand
+  // logos), each with its own amount of padding baked into its own SVG
+  // viewBox — so even inside an identically-sized chip, some icons look
+  // visually bigger/bolder than others purely because their artwork fills
+  // more of their own canvas than someone else's does. Sample the actual
+  // non-transparent pixel bounds and scale up to consistently fill the
+  // chip (clamped, and clipped by the chip's own overflow:hidden) so icon
+  // weight reads as consistent across completely unrelated icon sets.
+  function normalizeIconScale(img, data, size) {
+    let minX = size, minY = size, maxX = -1, maxY = -1;
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        if (data[(y * size + x) * 4 + 3] > 10) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    if (maxX < 0) return; // fully transparent, nothing to scale against
+
+    const contentSize = Math.max(maxX - minX + 1, maxY - minY + 1);
+    const scale = Math.min(size / contentSize, 1.6);
+    img.style.transform = scale > 1.03 ? `scale(${scale.toFixed(3)})` : "";
+  }
+
   function checkIconContrast(img, wrapEl) {
     try {
-      const size = 24;
+      const size = 32;
       const canvas = document.createElement("canvas");
       canvas.width = size;
       canvas.height = size;
@@ -125,23 +152,42 @@
 
       let total = 0;
       let weight = 0;
+      let colorfulWeight = 0;
       for (let i = 0; i < data.length; i += 4) {
         const a = data[i + 3] / 255;
         if (a < 0.15) continue;
-        total += (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) * a;
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        total += (0.299 * r + 0.587 * g + 0.114 * b) * a;
         weight += a;
+        if (Math.max(r, g, b) - Math.min(r, g, b) > 24) colorfulWeight += a;
       }
-      if (weight < 1) return; // fully transparent icon, nothing to evaluate
+
+      normalizeIconScale(img, data, size);
+      img.style.filter = "";
+      wrapEl.classList.remove("icon-needs-backing", "icon-backing-light");
+
+      if (weight < 1) return; // fully transparent icon, nothing to evaluate for contrast
 
       const iconLum = total / weight;
       const bgLum = pageBgLuminance();
       const contrast = Math.abs(iconLum - bgLum);
 
       if (contrast < 60) {
-        wrapEl.classList.add("icon-needs-backing");
-        wrapEl.classList.toggle("icon-backing-light", bgLum < 128);
-      } else {
-        wrapEl.classList.remove("icon-needs-backing", "icon-backing-light");
+        // Almost no saturated pixels = a flat black/white icon with no
+        // brand color to protect (e.g. a plain MDI line icon) — invert it
+        // to sit directly on the current background instead of boxing it
+        // in a chip, so it stays the same visual size/weight as every
+        // icon that already had enough contrast on its own. A genuinely
+        // multi-color mark (one with an intentionally dark badge as part
+        // of its real logo, e.g. Plex/Radarr) can't be safely inverted
+        // without corrupting its actual colors — that still gets a chip.
+        const isMonochrome = colorfulWeight / weight < 0.08;
+        if (isMonochrome) {
+          img.style.filter = "invert(1)";
+        } else {
+          wrapEl.classList.add("icon-needs-backing");
+          wrapEl.classList.toggle("icon-backing-light", bgLum < 128);
+        }
       }
     } catch (e) {
       // Cross-origin canvas read blocked — leave the icon as-is.
@@ -503,11 +549,24 @@
       btn.innerHTML = THEME_ICONS[next];
     });
 
-    const year = document.createElement("span");
-    year.textContent = new Date().getFullYear();
+    const left = document.createElement("div");
+    left.className = "footer-left";
+
+    const link = document.createElement("a");
+    link.className = "footer-link";
+    link.href = "https://github.com/shuricksumy/foyer";
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.title = "Foyer on GitHub";
+    link.innerHTML = `
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.492.998.108-.776.417-1.305.76-1.605-2.665-.305-5.467-1.334-5.467-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.405c1.02.005 2.047.138 3.006.405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.807 5.625-5.479 5.92.435.375.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      <span>Foyer</span>
+    `;
+
+    left.appendChild(link);
 
     els.footer.innerHTML = "";
-    els.footer.appendChild(year);
+    els.footer.appendChild(left);
     els.footer.appendChild(btn);
   }
 

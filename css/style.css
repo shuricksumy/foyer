@@ -85,16 +85,16 @@ body {
   display: none;
 }
 
-/* Keep the theme toggle reachable when folded — only the year label
-   (which needs room to read) hides; the button itself stays, centered
-   like the rest of the icon rail, instead of the whole footer vanishing
-   and taking the toggle down with it. */
+/* Keep the theme toggle reachable when folded — only the Foyer link/year
+   (which need room to read) hide; the button itself stays, centered like
+   the rest of the icon rail, instead of the whole footer vanishing and
+   taking the toggle down with it. */
 .sidebar.collapsed .sidebar-footer {
   justify-content: center;
   padding: 10px 0;
 }
 
-.sidebar.collapsed .sidebar-footer > span {
+.sidebar.collapsed .sidebar-footer > .footer-left {
   display: none;
 }
 
@@ -323,6 +323,7 @@ body {
   height: 22px;
   flex-shrink: 0;
   border-radius: 6px;
+  overflow: hidden;
 }
 
 /* Applied only to icons whose own colors are too close to the current
@@ -384,6 +385,29 @@ body {
 .theme-toggle svg {
   width: 16px;
   height: 16px;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.footer-link:hover {
+  color: var(--text);
 }
 
 /* ---------- Main content ---------- */
