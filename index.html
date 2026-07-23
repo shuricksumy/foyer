@@ -9,6 +9,16 @@
 <body>
   <div class="app">
     <aside class="sidebar" id="sidebar">
+      <script>
+        // Applies a saved sidebar preference before this element paints,
+        // so there's nothing to visibly transition away from — reading
+        // localStorage and toggling the class *after* first paint (which
+        // is what app.js necessarily does, since it waits on the config
+        // fetch) is what causes the wide-then-narrow flash on reload.
+        if (localStorage.getItem("start.sidebarCollapsed") === "1") {
+          document.currentScript.parentElement.classList.add("collapsed");
+        }
+      </script>
       <div class="sidebar-header">
         <button id="sidebarToggle" class="icon-btn" aria-label="Toggle sidebar" title="Toggle sidebar">
           <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>

@@ -65,7 +65,10 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 12px;
+  /* Same vertical padding as .content-header so both header rows are the
+     same height and their border-bottom lines land flush across the
+     sidebar/content boundary instead of stepping. */
+  padding: 10px 12px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -78,8 +81,20 @@ body {
 }
 
 .sidebar.collapsed .brand,
-.sidebar.collapsed .sidebar-search,
+.sidebar.collapsed .sidebar-search {
+  display: none;
+}
+
+/* Keep the theme toggle reachable when folded — only the year label
+   (which needs room to read) hides; the button itself stays, centered
+   like the rest of the icon rail, instead of the whole footer vanishing
+   and taking the toggle down with it. */
 .sidebar.collapsed .sidebar-footer {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.sidebar.collapsed .sidebar-footer > span {
   display: none;
 }
 
@@ -90,16 +105,17 @@ body {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  border: none;
-  background: transparent;
+  border: 1px solid var(--border);
+  background: var(--bg-hover);
   color: var(--text-muted);
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .icon-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
 }
 
 .icon-btn svg {

@@ -442,10 +442,15 @@
 
   function setupSidebarToggle() {
     const stored = localStorage.getItem(STORAGE_KEYS.collapsed);
-    // No stored preference yet: default to closed on phone-width screens
-    // (a full-width drawer covering the page on first load is a worse
-    // first impression than an icon rail) but open on desktop, as before.
-    const collapsed = stored === null ? isMobileViewport() : stored === "1";
+    // No stored preference yet: default to open (wide). The sidebar's
+    // initial HTML has no "collapsed" class, so this is also the only
+    // default that requires no class mutation once config finishes
+    // loading — anything else (e.g. defaulting closed) means toggling
+    // the class after the page has already painted open, which fires
+    // the width transition as a visible wide-then-narrow flash on every
+    // fresh load. Once a visitor toggles it, that choice sticks (see
+    // setSidebarCollapsed) regardless of this default.
+    const collapsed = stored === null ? false : stored === "1";
     applySidebarState(collapsed);
 
     els.sidebarToggle.addEventListener("click", () => {
