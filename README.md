@@ -99,6 +99,12 @@ a project's own repo, something you made) as `icons/<name>.svg` and point to it 
 doesn't need to change. `sh:`/`mdi:`/`si:` (pulled live from their CDNs) still work for
 anything you haven't bothered to save locally yet.
 
+Where to search for one: [selfh.st/icons](https://selfh.st/icons/) (`sh:name`, self-hosted-app
+logos), [Material Design Icons](https://pictogrammers.com/library/mdi/) (`mdi:name`, general-purpose
+glyphs — network, media, hardware, etc.), [Simple Icons](https://simpleicons.org/) (`si:name`, brand
+logos). Find the slug on the site, try it live with the matching prefix, then save it locally once
+you're happy with it.
+
 Every icon also gets handled automatically at render time, no config needed: sized to visually
 match regardless of how much padding its own artwork has baked in, and — if its color is too
 close to the current theme's background — either inverted (for a flat black/white icon with no
