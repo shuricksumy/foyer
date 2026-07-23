@@ -504,16 +504,27 @@ body {
 }
 
 .content-header {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 6px;
   padding: 10px 16px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
+/* Centered on the header as a whole (not just the flex gap between the home
+   button and clock, which would skew off-center since those two are
+   different widths) — taken out of flow and centered independently via
+   absolute positioning, with max-width so it can't run under either
+   sibling on a narrow window. */
 .pane-title {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 50%;
   font-weight: 600;
   font-size: 14px;
   overflow: hidden;
