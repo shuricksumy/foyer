@@ -485,6 +485,7 @@ body {
 }
 
 .dashboard-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -496,6 +497,15 @@ body {
   cursor: pointer;
   color: var(--text);
   font: inherit;
+}
+
+.dashboard-card.new-tab-hint::after {
+  content: "↗";
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 .dashboard-card:hover {

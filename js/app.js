@@ -305,7 +305,7 @@
     dashboardEntries.sort((a, b) => a.order - b.order);
     dashboardEntries.forEach(({ item, url, sidebarLink }) => {
       const card = document.createElement("button");
-      card.className = "dashboard-card";
+      card.className = "dashboard-card" + (item.embed === false ? " new-tab-hint" : "");
       card.title = item.name + (item.embed === false ? " (opens in new tab)" : "");
 
       const iconSrc = resolveIcon(item.icon);
