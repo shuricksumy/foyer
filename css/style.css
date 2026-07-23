@@ -174,6 +174,36 @@ body {
   margin-bottom: 4px;
 }
 
+/* "Level 0" groups (show_as_group: false in config) — items show directly,
+   no header, no folded-mode flyout. Thin dividers separate them from
+   whichever named groups actually border them — only on sides where a
+   neighbor exists (:not(:first-child)/:not(:last-child) — disabled groups
+   never enter the DOM at all, so these correctly reflect real neighbors,
+   not config positions), since an ungrouped group can trail the last group
+   (only needs a top divider), lead the first (only bottom), or sit
+   sandwiched between two (both).
+
+   Expanded-mode only (.sidebar:not(.collapsed)) — folded mode draws its
+   own dividers as ::before/::after pseudo-elements further down instead
+   of a real border, because margin/border on the group itself would also
+   narrow the icon buttons' box and throw off their centering in the rail.
+   This rule used to have no such scope and stayed active when folded too,
+   stacking directly on top of the pseudo-element divider — that doubled
+   line was a real, reproducible bug (confirmed via computed styles:
+   border-top-width and the ::before pseudo were both 1px at once on the
+   same folded element), not a misread screenshot. */
+.sidebar:not(.collapsed) .group.ungrouped:not(:first-child) {
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+.sidebar:not(.collapsed) .group.ungrouped:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+}
+
 .group-title {
   display: flex;
   align-items: center;
@@ -234,6 +264,60 @@ body {
    <body> (see above), so it's no longer a descendant of .sidebar and this
    rule doesn't touch it. */
 .sidebar.collapsed .item-list {
+  display: none;
+}
+
+/* Ungrouped ("level 0") items have no group-icon-btn/flyout to hide behind
+   — they need to stay directly visible in the folded rail, same as the
+   flat all-icons rail this app used before the flyout redesign. Icon-only,
+   centered, label/new-tab-arrow hidden (no room in a 64px rail; the title
+   tooltip covers both). */
+.sidebar.collapsed .group.ungrouped {
+  position: relative;
+  margin: 8px 0;
+  padding: 8px 0;
+}
+
+/* Inset dividers drawn as pseudo-elements rather than margin/border on the
+   group itself — margin here would also narrow the icon buttons' own box,
+   throwing off their centering in the rail. Only on sides that actually
+   border another group (same :not(:first-child)/:not(:last-child) logic
+   as the expanded-mode version above) — otherwise a trailing group (like
+   the public demo's, which is last) gets an orphaned line after it with
+   nothing left to divide from. */
+.sidebar.collapsed .group.ungrouped:not(:first-child)::before,
+.sidebar.collapsed .group.ungrouped:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  background: var(--border);
+}
+
+.sidebar.collapsed .group.ungrouped:not(:first-child)::before {
+  top: 0;
+}
+
+.sidebar.collapsed .group.ungrouped:not(:last-child)::after {
+  bottom: 0;
+}
+
+.sidebar.collapsed .group.ungrouped .item-list {
+  display: block;
+}
+
+.sidebar.collapsed .group.ungrouped .item {
+  justify-content: center;
+  padding: 7px 0;
+  margin: 1px 0;
+}
+
+.sidebar.collapsed .group.ungrouped .item-label {
+  display: none;
+}
+
+.sidebar.collapsed .group.ungrouped .item.new-tab-hint::after {
   display: none;
 }
 

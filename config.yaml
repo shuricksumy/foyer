@@ -39,6 +39,18 @@
 # mode collapses each group down to that one icon; hover (or tap) it to pop
 # open a flyout with the group's items, same as expanded mode.
 #
+# "show_as_group: false" on a group makes it "level 0" — its items show up
+# directly, with no header and no folded-mode flyout to hide behind: they're
+# just always visible, wherever that group entry sits in this file (see the
+# ungrouped entry at the very end of "groups:" below for a real example —
+# that's why Status doesn't live under Network anymore). You can still set
+# "name"/"icon" on it for your own reference; they just won't render
+# anywhere. A divider shows on whichever sides actually border another
+# group — none, one, or both, depending on where you place it. Can't be
+# collapsed in expanded mode either, on purpose — there's no header to
+# click to bring it back if it got hidden. Defaults to a normal group
+# (true) when left off, same as "enabled".
+#
 # "enabled: false" on an item or a whole group hides it everywhere (sidebar,
 # flyout, dashboard grid) without deleting it — for a service that's
 # temporarily down, being reinstalled, whatever. Leave the field off
@@ -96,12 +108,6 @@ groups:
   - name: Network
     icon: local:lan
     items:
-      - name: Status
-        icon: local:chart-line
-        embed: true
-        dashboard: 1
-        link: { type: path, value: /status/ }
-
       - name: VPN Admin
         icon: local:openvpn
         embed: true
@@ -300,3 +306,16 @@ groups:
         icon: local:cellphone
         embed: true
         link: { type: port, value: 8833 }
+
+  # "show_as_group: false" — this is a "level 0" group (see the comment
+  # above "groups:"). Status shows up directly after all the named groups
+  # above, no header, always visible even when the sidebar is folded. The
+  # "name" here is just for readability in this file — it never renders.
+  - name: Quick Access
+    show_as_group: false
+    items:
+      - name: Status
+        icon: local:chart-line
+        embed: true
+        dashboard: 1
+        link: { type: path, value: /status/ }

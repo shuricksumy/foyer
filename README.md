@@ -81,6 +81,13 @@ field. Refresh the browser tab, no restart needed. In short, each item needs:
   reinstalled. Defaults to enabled when left off; disabling a group hides all its items
   regardless of their own `enabled`. See `config.yaml`'s `Traccar`/`Mobile` entries for a
   working example of both.
+- `show_as_group: false` on a group — "level 0": its items show up directly, no header, no
+  folded-mode flyout to hide behind, always visible. A divider shows on whichever sides
+  actually border another group (none, one, or both, depending on where you place it in the
+  file) — not tied to config position, so it stays correct if you reorder groups around it.
+  You can still set `name`/`icon` on it for your own reference; they just never render.
+  Defaults to a normal group when left off. See `config.yaml`'s "Quick Access" group (holding
+  `Status`) for a working example.
 
 ## Icons
 
@@ -91,6 +98,12 @@ a project's own repo, something you made) as `icons/<name>.svg` and point to it 
 `local:<name>`. To fix one that looks wrong, just overwrite that file — the config reference
 doesn't need to change. `sh:`/`mdi:`/`si:` (pulled live from their CDNs) still work for
 anything you haven't bothered to save locally yet.
+
+Every icon also gets handled automatically at render time, no config needed: sized to visually
+match regardless of how much padding its own artwork has baked in, and — if its color is too
+close to the current theme's background — either inverted (for a flat black/white icon with no
+brand color to protect) or given a small contrasting backing chip (for a genuinely multi-color
+mark, so its real colors aren't corrupted by inverting it).
 
 ## Clock
 

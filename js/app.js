@@ -362,71 +362,88 @@
     groups.forEach((group, gi) => {
       if (group.enabled === false) return;
 
+      // "show_as_group: false" is "level 0" — ungrouped items meant to show
+      // up directly, with no header and no folded-mode flyout (there's no
+      // group identity to collapse behind or represent with one icon).
+      // Everything below that builds the header/flyout machinery is simply
+      // skipped for these; their items render exactly like any other
+      // group's, just always visible instead of hidden behind a trigger.
+      // "name" can still be set for your own reference in the config even
+      // when show_as_group is false — it just never renders anywhere.
+      const isUngrouped = group.show_as_group === false;
+
       const groupId = group.name || `group-${gi}`;
       const groupEl = document.createElement("div");
-      groupEl.className = "group";
-      if (groupState[groupId]) groupEl.classList.add("collapsed");
+      groupEl.className = "group" + (isUngrouped ? " ungrouped" : "");
+      groupEl.dataset.groupId = groupId;
+      if (!isUngrouped && groupState[groupId]) groupEl.classList.add("collapsed");
 
-      const titleBtn = document.createElement("button");
-      titleBtn.className = "group-title";
-      titleBtn.title = group.name || "";
-      titleBtn.innerHTML = `
-        <svg class="chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>${group.name || ""}</span>
-      `;
-      titleBtn.addEventListener("click", () => {
-        // Only meaningful in expanded mode — folded mode shows/hides the
-        // whole group via the flyout instead (see groupIconBtn below).
-        if (els.sidebar.classList.contains("collapsed")) return;
-        groupEl.classList.toggle("collapsed");
-        groupState[groupId] = groupEl.classList.contains("collapsed");
-        saveGroupState(groupState);
-      });
-
-      // Folded-mode-only: one representative icon per group. Hovering (or
-      // tapping, for touch) it pops the group's full item list open as a
-      // flyout, so folding the sidebar doesn't lose the ability to tell
-      // groups apart or reach their items (see the earlier "no any
-      // understanding what is here" feedback on the flat icon rail).
-      const groupIconBtn = document.createElement("button");
-      groupIconBtn.className = "group-icon-btn";
-      groupIconBtn.title = group.name || "";
-      const groupIconSrc = resolveIcon(group.icon);
-      if (groupIconSrc) {
-        const wrap = document.createElement("span");
-        wrap.className = "item-icon-wrap";
-        const img = document.createElement("img");
-        img.className = "item-icon";
-        img.src = groupIconSrc;
-        img.alt = "";
-        img.loading = "lazy";
-        img.crossOrigin = "anonymous";
-        img.addEventListener("load", () => checkIconContrast(img, wrap));
-        wrap.appendChild(img);
-        groupIconBtn.appendChild(wrap);
-        iconWraps.push({ img, wrap });
-      }
       const list = document.createElement("ul");
       list.className = "item-list";
 
-      groupIconBtn.addEventListener("mouseenter", () => openFlyoutFor(groupEl, list, groupIconBtn));
-      groupIconBtn.addEventListener("mouseleave", () => closeFlyout(false));
-      groupIconBtn.addEventListener("focus", () => openFlyoutFor(groupEl, list, groupIconBtn));
-      groupIconBtn.addEventListener("click", () => {
-        // Just ensure it's open, don't toggle — a click is preceded by a
-        // real "mouseenter" on non-touch devices (already opening it via
-        // hover), so a toggle-close-if-open would immediately re-close
-        // whatever hover just opened. Touch users close it by tapping
-        // elsewhere (see the outside-click handler) or picking an item.
-        openFlyoutFor(groupEl, list, groupIconBtn);
-      });
-      list.addEventListener("mouseenter", () => clearTimeout(closeTimer));
-      list.addEventListener("mouseleave", () => closeFlyout(false));
+      let titleBtn = null;
+      let groupIconBtn = null;
 
-      const flyoutHeader = document.createElement("li");
-      flyoutHeader.className = "flyout-header";
-      flyoutHeader.textContent = group.name || "";
-      list.appendChild(flyoutHeader);
+      if (!isUngrouped) {
+        titleBtn = document.createElement("button");
+        titleBtn.className = "group-title";
+        titleBtn.title = group.name || "";
+        titleBtn.innerHTML = `
+          <svg class="chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>${group.name || ""}</span>
+        `;
+        titleBtn.addEventListener("click", () => {
+          // Only meaningful in expanded mode — folded mode shows/hides the
+          // whole group via the flyout instead (see groupIconBtn below).
+          if (els.sidebar.classList.contains("collapsed")) return;
+          groupEl.classList.toggle("collapsed");
+          groupState[groupId] = groupEl.classList.contains("collapsed");
+          saveGroupState(groupState);
+        });
+
+        // Folded-mode-only: one representative icon per group. Hovering (or
+        // tapping, for touch) it pops the group's full item list open as a
+        // flyout, so folding the sidebar doesn't lose the ability to tell
+        // groups apart or reach their items (see the earlier "no any
+        // understanding what is here" feedback on the flat icon rail).
+        groupIconBtn = document.createElement("button");
+        groupIconBtn.className = "group-icon-btn";
+        groupIconBtn.title = group.name || "";
+        const groupIconSrc = resolveIcon(group.icon);
+        if (groupIconSrc) {
+          const wrap = document.createElement("span");
+          wrap.className = "item-icon-wrap";
+          const img = document.createElement("img");
+          img.className = "item-icon";
+          img.src = groupIconSrc;
+          img.alt = "";
+          img.loading = "lazy";
+          img.crossOrigin = "anonymous";
+          img.addEventListener("load", () => checkIconContrast(img, wrap));
+          wrap.appendChild(img);
+          groupIconBtn.appendChild(wrap);
+          iconWraps.push({ img, wrap });
+        }
+
+        groupIconBtn.addEventListener("mouseenter", () => openFlyoutFor(groupEl, list, groupIconBtn));
+        groupIconBtn.addEventListener("mouseleave", () => closeFlyout(false));
+        groupIconBtn.addEventListener("focus", () => openFlyoutFor(groupEl, list, groupIconBtn));
+        groupIconBtn.addEventListener("click", () => {
+          // Just ensure it's open, don't toggle — a click is preceded by a
+          // real "mouseenter" on non-touch devices (already opening it via
+          // hover), so a toggle-close-if-open would immediately re-close
+          // whatever hover just opened. Touch users close it by tapping
+          // elsewhere (see the outside-click handler) or picking an item.
+          openFlyoutFor(groupEl, list, groupIconBtn);
+        });
+        list.addEventListener("mouseenter", () => clearTimeout(closeTimer));
+        list.addEventListener("mouseleave", () => closeFlyout(false));
+
+        const flyoutHeader = document.createElement("li");
+        flyoutHeader.className = "flyout-header";
+        flyoutHeader.textContent = group.name || "";
+        list.appendChild(flyoutHeader);
+      }
 
       (group.items || []).forEach((item) => {
         if (item.enabled === false) return;
@@ -474,8 +491,8 @@
         list.appendChild(li);
       });
 
-      groupEl.appendChild(titleBtn);
-      groupEl.appendChild(groupIconBtn);
+      if (titleBtn) groupEl.appendChild(titleBtn);
+      if (groupIconBtn) groupEl.appendChild(groupIconBtn);
       groupEl.appendChild(list);
       els.navGroups.appendChild(groupEl);
     });
@@ -522,6 +539,12 @@
           groupEl.style.display = anyVisible ? "" : "none";
         } else {
           groupEl.style.display = "";
+          // Restore whatever collapsed state existed before searching
+          // instead of leaving it stuck collapsed from a zero-match
+          // search — ungrouped groups never collapse at all, since they
+          // have no header/toggle button to re-expand them if they did.
+          const collapsedBefore = !groupEl.classList.contains("ungrouped") && !!loadGroupState()[groupEl.dataset.groupId];
+          groupEl.classList.toggle("collapsed", collapsedBefore);
         }
       });
     });
