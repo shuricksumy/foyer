@@ -2,11 +2,9 @@
 
 A config-driven homelab start page — the entryway to every self-hosted service you run.
 
-**[Live demo](https://raw.githack.com/shuricksumy/foyer/main/index.html)** — runs `index.html`
-straight from the repo's raw files via [githack](https://raw.githack.com/), no hosting/build step or
-GitHub Pages setup required; it always reflects whatever's on `main`. Swap `raw.githack.com` for
-`rawcdn.githack.com` (a jsdelivr-backed, cached version of the same thing) for a stable link to share
-rather than a live-editing one. `config.yaml` is a sanitized example config — your real setup goes in
+**[Live demo](https://shuricksumy.github.io/foyer/)** — served via GitHub Pages straight from `main`,
+no build step of its own (Pages just serves the static files as-is). `config.yaml` is a sanitized
+example config with real official-site links for the well-known services — your real setup goes in
 the gitignored private profiles (see **Profiles** below), which never get pushed.
 
 Sidebar of self-hosted services, click one and it loads into a pane on the right without leaving
