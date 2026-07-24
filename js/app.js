@@ -293,6 +293,13 @@
   // highlights in sync.
   const dashboardEntries = [];
 
+  // "landing: true" on an item (only meaningful alongside "embed: true")
+  // loads that item straight into the pane on page load instead of the
+  // dashboard grid — the home button still shows the grid as usual,
+  // this only changes what greets a fresh visit. First match wins if
+  // more than one item sets it.
+  let landingEntry = null;
+
   function dashboardOrder(item) {
     const v = item.dashboard;
     if (v === undefined || v === null || v === false || v === "none") return null;
@@ -358,6 +365,7 @@
     const groupState = loadGroupState();
     els.navGroups.innerHTML = "";
     dashboardEntries.length = 0;
+    landingEntry = null;
 
     groups.forEach((group, gi) => {
       if (group.enabled === false) return;
@@ -486,6 +494,16 @@
 
         const order = dashboardOrder(item);
         if (order !== null) dashboardEntries.push({ item, url, sidebarLink: a, order });
+
+        if (item.landing === true) {
+          if (!item.embed) {
+            console.warn(`"${item.name}" has landing: true but embed is not true — landing only works with embed: true, ignoring.`);
+          } else if (!landingEntry) {
+            landingEntry = { item, url, sidebarLink: a };
+          } else {
+            console.warn(`"${item.name}" has landing: true but "${landingEntry.item.name}" already claimed it — only the first one in the file is used, ignoring.`);
+          }
+        }
 
         li.appendChild(a);
         list.appendChild(li);
@@ -661,7 +679,11 @@
 
     renderGroups(config.groups || []);
     renderDashboardGrid();
-    showHome();
+    if (landingEntry) {
+      selectItem(landingEntry.item, landingEntry.url, landingEntry.sidebarLink);
+    } else {
+      showHome();
+    }
     els.homeBtn.addEventListener("click", showHome);
 
     setupSidebarToggle();

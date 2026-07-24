@@ -69,6 +69,16 @@
 # Numbers don't need to be contiguous or unique to a group, just unique
 # overall — they're only compared to each other for sort order.
 #
+# "landing: true" on an item (needs "embed: true" alongside it — it has no
+# meaning for a new-tab item since there'd be nothing to show in the pane)
+# loads that item straight into the pane on page load instead of the usual
+# dashboard grid, for a profile whose real purpose is one specific service
+# (e.g. always opening straight to Home Assistant instead of a grid first).
+# The house icon still returns to the grid as normal — this only changes
+# what a fresh page load shows. Leave it off (default false) to keep
+# landing on the grid. If more than one item sets it, the first one found
+# wins; only one item is used.
+#
 # "clock:" (optional, top-level) controls the clock in the content header.
 # Every field is optional and defaults to what's shown here if the whole
 # section is left out entirely.
