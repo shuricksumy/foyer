@@ -52,7 +52,12 @@ editing, it's the source of truth, not this file. Briefly:
   always a manual per-service choice.
 - **`dashboard: <number>`** puts an item on the home grid (`renderDashboardGrid()`) at that fixed
   sorted position — a position, not just on/off, so an item stays in the same grid cell regardless of
-  config reordering elsewhere.
+  config reordering elsewhere. Top-level **`dashboard_sections:`** entries carry a `dashboard:`
+  number on that *same* scale and render as full-width divider rules, so a section at 20 owns every
+  item from 20 to the next section — the numbers are the only grouping mechanism, deliberately, so
+  there's no second per-item `section:` field to drift out of sync. Headers are emitted while walking
+  the sorted cards, which is what makes an empty band (or one whose items are all `enabled: false`)
+  render nothing instead of a dangling label.
 - **`enabled: false`** on an item or group hides it everywhere (sidebar, flyout, dashboard grid) —
   checked as an early-return at the top of each `forEach` in `renderGroups()`, so a disabled group's
   items never even get processed. Defaults to enabled when the field is absent.

@@ -76,6 +76,15 @@ field. Refresh the browser tab, no restart needed. In short, each item needs:
 - `dashboard: <number>` — puts the item on the home grid at that fixed sorted position (not
   just on/off — a position, so it stays in the same grid cell regardless of config reordering
   elsewhere). Leave it off to keep the item off the grid.
+- `dashboard_sections:` (top-level, optional) — labelled divider rules across the home grid,
+  turning it into bands (`──── MAIN ────`, `──── AI SERVICES ────`, ...) instead of one flat
+  wall of icons. Each section is a `name` plus the same `dashboard: <number>` position an item
+  uses, on one shared scale: a section at `20` claims every item from 20 up to the next
+  section's number, so the numbers alone decide both which band an item lands in and its place
+  inside it — there's no per-item `section:` field to keep in sync. Hence numbering items in
+  decades (10, 11, 12 ... 20, 21 ...), as `config.yaml` does. Items numbered below the first
+  section render above all headers; a section with nothing under it isn't drawn at all, so
+  disabling a band's last item doesn't leave a dangling header.
 - `enabled: false` — on an item or a whole group, hides it everywhere (sidebar, flyout,
   dashboard grid) without deleting its config — for something temporarily down or being
   reinstalled. Defaults to enabled when left off; disabling a group hides all its items

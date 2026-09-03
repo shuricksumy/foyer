@@ -293,6 +293,24 @@
   // highlights in sync.
   const dashboardEntries = [];
 
+  // Section headers on the home grid ("dashboard_sections:" at the top level
+  // of the config): a full-width "──── AI services ────" rule that splits the
+  // grid into labelled bands. A header carries the same "dashboard: <number>"
+  // position as an item, so both live on one shared scale — a header at 20
+  // captures every card from 20 up to whatever the next header sits at. That
+  // way the numbers alone decide the whole layout (which band, and where
+  // inside it), with no second "section: <name>" field to keep in sync on
+  // every item.
+  let dashboardSections = [];
+
+  function parseDashboardSections(list) {
+    return (Array.isArray(list) ? list : [])
+      .filter((sec) => sec && sec.enabled !== false)
+      .map((sec) => ({ name: sec.name || "", order: dashboardOrder(sec) }))
+      .filter((sec) => sec.order !== null)
+      .sort((a, b) => a.order - b.order);
+  }
+
   // "landing: true" on an item (only meaningful alongside "embed: true")
   // loads that item straight into the pane on page load instead of the
   // dashboard grid — the home button still shows the grid as usual,
@@ -310,7 +328,30 @@
   function renderDashboardGrid() {
     els.dashboardGrid.innerHTML = "";
     dashboardEntries.sort((a, b) => a.order - b.order);
-    dashboardEntries.forEach(({ item, url, sidebarLink }) => {
+
+    // Walked alongside the sorted cards rather than rendered up front, so a
+    // header with nothing under it never shows: consecutive headers passed
+    // before the same card collapse to the last one (an empty band, e.g. one
+    // whose only items are "enabled: false"), and a header numbered past
+    // every card is never reached at all. Cards numbered below the first
+    // header just render bare, which is what every existing config without
+    // any sections gets.
+    let si = 0;
+    dashboardEntries.forEach(({ item, url, sidebarLink, order }) => {
+      while (si < dashboardSections.length && dashboardSections[si].order <= order) {
+        const sec = dashboardSections[si++];
+        const covered = si < dashboardSections.length && dashboardSections[si].order <= order;
+        if (!covered) {
+          const header = document.createElement("div");
+          header.className = "dashboard-section";
+          const label = document.createElement("span");
+          label.className = "dashboard-section-label";
+          label.textContent = sec.name;
+          header.appendChild(label);
+          els.dashboardGrid.appendChild(header);
+        }
+      }
+
       const card = document.createElement("button");
       card.className = "dashboard-card" + (item.embed === false ? " new-tab-hint" : "");
       card.title = item.name + (item.embed === false ? " (opens in new tab)" : "");
@@ -677,6 +718,7 @@
     setupThemeToggle(initialTheme);
     startClock(config.clock);
 
+    dashboardSections = parseDashboardSections(config.dashboard_sections);
     renderGroups(config.groups || []);
     renderDashboardGrid();
     if (landingEntry) {

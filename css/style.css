@@ -579,6 +579,39 @@ body {
   padding: 28px;
 }
 
+/* A grid-wide band label ("──── AI services ────"). grid-column: 1 / -1 is
+   what makes it a delimiter rather than a cell: spanning every column forces
+   the cards after it onto a fresh row, so the bands stay visually separate
+   at any window width without the grid needing per-section containers. */
+.dashboard-section {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 12px 0 -2px;
+}
+
+.dashboard-section:first-child {
+  margin-top: 0;
+}
+
+.dashboard-section::before,
+.dashboard-section::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.dashboard-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 .dashboard-card {
   position: relative;
   display: flex;

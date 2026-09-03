@@ -67,7 +67,35 @@
 # for anything that shouldn't be on the grid. No items marked = home grid is
 # empty and the page falls back to the plain "pick something" placeholder.
 # Numbers don't need to be contiguous or unique to a group, just unique
-# overall — they're only compared to each other for sort order.
+# overall — they're only compared to each other for sort order. Leaving gaps
+# (10, 11, 12 ... 20, 21 ...) costs nothing and leaves room to slot something
+# in later without renumbering, which is also what "dashboard_sections:"
+# below builds on.
+#
+# "dashboard_sections:" (optional, top-level) draws labelled divider rules
+# across the home grid, so it reads as bands instead of one long wall of
+# icons:
+#
+#   ──────── MAIN ────────
+#     [ ] [ ] [ ] [ ]
+#   ───── AI SERVICES ─────
+#     [ ] [ ] [ ]
+#
+# A section is just a name plus the same "dashboard: <number>" position an
+# item uses — one shared scale for both. A section at 20 takes every item
+# from 20 up to wherever the next section starts, so the numbers alone decide
+# everything: which band an item lands in, and where inside that band. Adding
+# a band, or moving one, is a single number here — no per-item "section:"
+# field to keep in sync. Hence the decade numbering in this file (10s = main,
+# 20s = home, 30s = media): a band's worth of room between headers.
+#   - Items numbered below the first section render above every header, bare.
+#     A config with no "dashboard_sections:" at all is exactly that case, and
+#     looks the way it always did.
+#   - A section with nothing under it (empty band, or a number past every
+#     item) doesn't render — no dangling header when the last item in a band
+#     gets "enabled: false".
+#   - "enabled: false" works on a section too; its items then fold into the
+#     band above it rather than disappearing.
 #
 # "landing: true" on an item (needs "embed: true" alongside it — it has no
 # meaning for a new-tab item since there'd be nothing to show in the pane)
@@ -114,6 +142,17 @@ clock:
   weekday: true
   date: true
 
+# Bands for the home grid, matching the "dashboard:" numbers used below.
+dashboard_sections:
+  - name: Main
+    dashboard: 10 # captures 10-19: Status, Traefik, Portainer, Gitea
+
+  - name: Home & Files
+    dashboard: 20 # captures 20-29: Home Assistant, Immich, Nextcloud
+
+  - name: Media
+    dashboard: 30 # captures 30 and up: Plex, Sonarr, Radarr
+
 groups:
   - name: Network
     icon: local:lan
@@ -139,13 +178,13 @@ groups:
       - name: Traefik
         icon: local:traefik
         embed: false # traefik.io sends X-Frame-Options: sameorigin
-        dashboard: 2
+        dashboard: 11
         link: { type: domain, value: https://traefik.io }
 
       - name: Portainer
         icon: local:portainer
         embed: true
-        dashboard: 3
+        dashboard: 12
         link: { type: domain, value: https://www.portainer.io }
 
       - name: Logs (Dozzle)
@@ -166,7 +205,7 @@ groups:
       - name: Gitea
         icon: local:gitea
         embed: true
-        dashboard: 4
+        dashboard: 13
         link: { type: domain, value: https://about.gitea.com }
 
       - name: Linux Shell
@@ -203,7 +242,7 @@ groups:
       - name: Home Assistant
         icon: local:home-assistant
         embed: true
-        dashboard: 5
+        dashboard: 20
         link: { type: domain, value: https://www.home-assistant.io }
 
       - name: Traccar
@@ -215,13 +254,13 @@ groups:
       - name: Immich
         icon: local:immich
         embed: true
-        dashboard: 6
+        dashboard: 21
         link: { type: domain, value: https://immich.app }
 
       - name: Nextcloud
         icon: local:nextcloud
         embed: false # nextcloud.com sends Content-Security-Policy: frame-ancestors 'self'
-        dashboard: 7
+        dashboard: 22
         link: { type: domain, value: https://nextcloud.com }
 
       - name: Joplin Notes
@@ -235,7 +274,7 @@ groups:
       - name: Plex
         icon: local:plex
         embed: false # plex.tv sends Content-Security-Policy: frame-ancestors 'self'
-        dashboard: 8
+        dashboard: 30
         link: { type: domain, value: https://www.plex.tv }
 
       - name: Lidarr
@@ -246,13 +285,13 @@ groups:
       - name: Sonarr
         icon: local:sonarr
         embed: false # sonarr.tv sends X-Frame-Options: DENY
-        dashboard: 9
+        dashboard: 31
         link: { type: domain, value: https://sonarr.tv }
 
       - name: Radarr
         icon: local:radarr
         embed: true
-        dashboard: 10
+        dashboard: 32
         link: { type: domain, value: https://radarr.video }
 
       - name: Prowlarr
@@ -327,5 +366,5 @@ groups:
       - name: Status
         icon: local:chart-line
         embed: true
-        dashboard: 1
+        dashboard: 10
         link: { type: path, value: /status/ }
