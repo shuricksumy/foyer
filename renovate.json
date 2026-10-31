@@ -1,7 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>shuricksumy/renovate-config",
-    "github>shuricksumy/renovate-config:no-automerge"
+    "github>shuricksumy/renovate-config"
   ]
 }
